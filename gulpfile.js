@@ -1,6 +1,8 @@
 'use strict';
 
 var gulp = require('gulp'),
+    sass = require('gulp-sass'),
+    sourcemaps = require('gulp-sourcemaps'),
     concatCss = require('gulp-concat-css'),
     minifyCSS = require('gulp-minify-css'),
     uglyfly = require('gulp-uglyfly'),
@@ -12,6 +14,14 @@ var gulp = require('gulp'),
 
 var pathSource = './_src/';
 var pathDestination = './dist/';
+
+gulp.task('sass', function () {
+    return gulp.src(pathSource + 'scss/**/*.scss')
+       .pipe(sourcemaps.init())
+       .pipe(sass().on('error', sass.logError))
+       .pipe(sourcemaps.write('/'))
+       .pipe(gulp.dest('css'));
+});
 
 gulp.task('css', function() {
     gulp.src(pathSource + '/css/*.css')
@@ -56,6 +66,9 @@ gulp.task('sprites', function () {
         .pipe(gulp.dest(pathDestination + 'images/sprites/'));
 });
 
-gulp.task('default', ['css', 'js']);
-gulp.task('graph', ['images', 'uploads', 'sprites']);
-gulp.task('everything', ['css', 'js', 'images', 'uploads', 'sprites']);
+gulp.task('default', ['sass', 'css', 'js']);
+gulp.task('production', ['css', 'js', 'images', 'uploads', 'sprites']);
+
+gulp.task('watch', function () {
+  gulp.watch(pathSource + 'scss/**/*.scss', ['sass', 'css', 'js']);
+});
