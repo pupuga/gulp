@@ -1,31 +1,37 @@
 'use strict';
 
-var gulp = require('gulp'),
-    rimraf = require('rimraf'),
-    sass = require('gulp-sass'),
-    sourcemaps = require('gulp-sourcemaps'),
-    concatCss = require('gulp-concat-css'),
-    cleanCss = require('gulp-clean-css'),
-    autoprefixer = require('gulp-autoprefixer'),
-    babel = require('gulp-babel'),
-    uglyfly = require('gulp-uglyfly'),
-    concat = require('gulp-concat'),
-    imagemin = require('gulp-imagemin'),
-    imageminJpegRecompress = require('imagemin-jpeg-recompress'),
-    imageminPngquant = require('imagemin-pngquant'),
-    svgSprite = require("gulp-svg-sprites");
-    //browserSync = require("browser-sync"),
-    //reload = browserSync.reload
+const gulp = require('gulp');
+const rimraf = require('rimraf');
 
-var src = './_src/';
-var dist = './dist/';
+const sass = require('gulp-sass');
+const cleanCss = require('gulp-clean-css');
+const autoprefixer = require('gulp-autoprefixer');
+
+const browserify = require('browserify');
+const babel = require('gulp-babel');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const uglify = require('gulp-uglify');
+const gutil = require('gulp-util');
+const es = require('event-stream');
+
+const sourcemaps = require('gulp-sourcemaps');
+
+const imagemin = require('gulp-imagemin');
+const imageminJpegRecompress = require('imagemin-jpeg-recompress');
+const imageminPngquant = require('imagemin-pngquant');
+const svgSprite = require("gulp-svg-sprites");
+
+const src = './_src/';
+const dist = './dist/';
 
 gulp.task('rimraf', function (cb) {
-   rimraf(dist, cb);
+    rimraf(dist + '**/*.*', cb);
 });
 
-gulp.task('sassDev', function () {
-    return gulp.src(src + 'scss/main.scss')
+var files = [src + 'scss/main.scss', src + 'scss/admin.scss'];
+gulp.task('sass:dev', function () {
+    return gulp.src(files)
        .pipe(sourcemaps.init())
        .pipe(sass().on('error', sass.logError))
        .pipe(autoprefixer({
@@ -37,38 +43,47 @@ gulp.task('sassDev', function () {
 });
 
 gulp.task('sass', function () {
-    return gulp.src(src + 'scss/main.scss')
-       .pipe(sass().on('error', sass.logError))
-       .pipe(autoprefixer({
-     	    browsers: ['last 2 versions'],
-            cascade: false
+    return gulp.src(files)
+        .pipe(sass().on('error', sass.logError))
+        .pipe(autoprefixer({
+            browsers: ['last 2 versions']
         }))
-       .pipe(concatCss('main.css'))
-       .pipe(cleanCss({keepBreaks: false}))
-       .pipe(gulp.dest(dist + 'css/'));
+        .pipe(cleanCss({keepBreaks: false}))
+        .pipe(gulp.dest(dist + 'css/'));
 });
 
-gulp.task('jsDev', function() {
-    gulp.src(src + 'js/*.js')
-       .pipe(sourcemaps.init())
-       .pipe(babel({
-            presets: ['env']
-        }))
-//       .pipe(concat('main.js'))
-       .pipe(sourcemaps.write())
-       .pipe(gulp.dest(dist + 'js/'))	
+var files = ['main.js', 'admin.js', 'login.js'];
+gulp.task('js:dev', function () {
+    var tasks = files.map(function (entry) {
+        return browserify({entries: [src + 'js/' + entry]})
+            .transform('babelify', {presets: ["env"]})
+            .bundle()
+            .pipe(source(entry))
+            .pipe(buffer())
+            .pipe(sourcemaps.init({loadMaps: true}))
+            .on('error', gutil.log)
+            .pipe(sourcemaps.write('./'))
+            .pipe(gulp.dest(dist + 'js/'))
+    });
+    return es.merge.apply(null, tasks);
 });
 
-gulp.task('js', function() {
-    gulp.src(src + 'js/*.js')
-        .pipe(concat('main.js'))
-        .pipe(uglyfly())
-        .pipe(gulp.dest(dist + 'js/'))
+gulp.task('js', function () {
+    var tasks = files.map(function (entry) {
+        return browserify({entries: [src + 'js/' + entry]})
+            .transform('babelify', {presets: ["env"]})
+            .bundle()
+            .pipe(source(entry))
+            .pipe(buffer())
+            .pipe(uglify())
+            .pipe(gulp.dest(dist + 'js/'))
+    });
+    return es.merge.apply(null, tasks);
 });
 
 function imagesTask(folder, folderOut) {
-gulp.src(src + folder)
-	.pipe(imagemin([
+    gulp.src(src + folder)
+        .pipe(imagemin([
             imagemin.gifsicle({interlaced: true}),
             imageminJpegRecompress({
                 progressive: true,
@@ -77,16 +92,16 @@ gulp.src(src + folder)
             }),
             imageminPngquant({quality: '75-85'}),
             imagemin.svgo({plugins: [{removeViewBox: false}]})
-		]))
-	.pipe(gulp.dest(dist + folderOut));
+        ]))
+        .pipe(gulp.dest(dist + folderOut));
 }
 
-gulp.task('images', function() {
-    imagesTask(src + 'images/**', dist + 'images/');
+gulp.task('images', function () {
+    imagesTask('images/**', 'images/');
 });
 
-gulp.task('uploads', function() {
-    imagesTask(src + 'uploads/**', dist + 'uploads/');    	    
+gulp.task('uploads', function () {
+    imagesTask('uploads/**', dist + 'uploads/');
 });
 
 gulp.task('sprites', function () {
@@ -95,8 +110,11 @@ gulp.task('sprites', function () {
         .pipe(gulp.dest(dist + 'sprites/'));
 });
 
-gulp.task('default', ['rimraf', 'sassDev', 'jsDev', 'images', 'uploads', 'sprites']);
+gulp.task('del', ['rimraf']);
+gulp.task('default', ['sass:dev', 'js:dev', 'images', 'uploads', 'sprites']);
 gulp.task('watch', function () {
-  gulp.watch([src + 'scss/**/*.scss', src + 'scss/**/*.css', src + 'js/**/*.js'], ['devSass', 'jsDev']);
+    gulp.watch([src + 'scss/**/*.scss'], ['dev:sass']);
+    gulp.watch([src + 'scss/**/*.css'], ['dev:sass']);
+    gulp.watch([src + 'js/**/*.js'], ['devSass', 'js:dev'])
 });
-gulp.task('prod', ['rimraf', 'sass', 'js', 'images', 'uploads', 'sprites']);
+gulp.task('prod', ['sass', 'js', 'images', 'uploads', 'sprites']);
