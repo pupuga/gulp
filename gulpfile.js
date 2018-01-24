@@ -111,6 +111,7 @@ gulp.task('sprites', function () {
 });
 
 gulp.task('del', ['rimraf']);
+gulp.task('up', ['uploads']);
 gulp.task('default', ['sass:dev', 'js:dev', 'images', 'uploads', 'sprites']);
 gulp.task('watch-sass', function () {
     gulp.watch([src + 'scss/**/*.scss'], ['sass:dev']);
