@@ -29,22 +29,23 @@ gulp.task('rimraf', function (cb) {
     rimraf(dist + '**/*.*', cb);
 });
 
-var files = [src + 'scss/main.scss', src + 'scss/admin.scss'];
-gulp.task('sass:dev', function () {
-    return gulp.src(files)
-       .pipe(sourcemaps.init())
-       .pipe(sass().on('error', sass.logError))
-       .pipe(autoprefixer({
+var filesSass = [src + 'scss/main.scss', src + 'scss/admin.scss'];
+
+gulp.task('sass:dev', function() {
+    return gulp.src(filesSass)
+        .pipe(sourcemaps.init())
+        .pipe(sass().on('error', sass.logError))
+        .pipe(autoprefixer({
      	    browsers: ['last 2 versions'],
             cascade: false
         }))
-       .pipe(sourcemaps.write())
-       .pipe(gulp.dest(dist + 'css/'));
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest(dist + 'css/'));
 });
 
 gulp.task('sass', function () {
-    return gulp.src(files)
-        .pipe(sass().on('error', sass.logError))
+    return gulp.src(filesSass)
+        .pipe(sass())
         .pipe(autoprefixer({
             browsers: ['last 2 versions']
         }))
@@ -52,9 +53,10 @@ gulp.task('sass', function () {
         .pipe(gulp.dest(dist + 'css/'));
 });
 
-var files = ['main.js', 'admin.js', 'login.js'];
+
+var filesJs = ['main.js', 'admin.js', 'login.js'];
 gulp.task('js:dev', function () {
-    var tasks = files.map(function (entry) {
+    var tasks = filesJs.map(function (entry) {
         return browserify({entries: [src + 'js/' + entry]})
             .transform('babelify', {presets: ["env"]})
             .bundle()
@@ -69,7 +71,7 @@ gulp.task('js:dev', function () {
 });
 
 gulp.task('js', function () {
-    var tasks = files.map(function (entry) {
+    var tasks = filesJs.map(function (entry) {
         return browserify({entries: [src + 'js/' + entry]})
             .transform('babelify', {presets: ["env"]})
             .bundle()
@@ -112,7 +114,8 @@ gulp.task('sprites', function () {
 
 gulp.task('del', ['rimraf']);
 gulp.task('up', ['uploads']);
-gulp.task('default', ['sass:dev', 'js:dev', 'images', 'uploads', 'sprites']);
+//gulp.task('default', ['sass:dev', 'js:dev', 'images', 'uploads', 'sprites']);
+gulp.task('default', ['sass:dev']);
 gulp.task('watch-sass', function () {
     gulp.watch([src + 'scss/**/*.scss'], ['sass:dev']);
     gulp.watch([src + 'scss/**/*.css'], ['sass:dev']);
