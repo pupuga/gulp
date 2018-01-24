@@ -112,9 +112,13 @@ gulp.task('sprites', function () {
 
 gulp.task('del', ['rimraf']);
 gulp.task('default', ['sass:dev', 'js:dev', 'images', 'uploads', 'sprites']);
+gulp.task('watch-sass', function () {
+    gulp.watch([src + 'scss/**/*.scss'], ['sass:dev']);
+    gulp.watch([src + 'scss/**/*.css'], ['sass:dev']);
+});
 gulp.task('watch', function () {
-    gulp.watch([src + 'scss/**/*.scss'], ['dev:sass']);
-    gulp.watch([src + 'scss/**/*.css'], ['dev:sass']);
-    gulp.watch([src + 'js/**/*.js'], ['devSass', 'js:dev'])
+    gulp.watch([src + 'scss/**/*.scss'], ['sass:dev']);
+    gulp.watch([src + 'scss/**/*.css'], ['sass:dev']);
+    gulp.watch([src + 'js/**/*.js'], ['js:dev'])
 });
 gulp.task('prod', ['sass', 'js', 'images', 'uploads', 'sprites']);
