@@ -30,7 +30,6 @@ gulp.task('rimraf', function (cb) {
 });
 
 var filesSass = [src + 'scss/main.scss', src + 'scss/admin.scss'];
-
 gulp.task('sass:dev', function() {
     return gulp.src(filesSass)
         .pipe(sourcemaps.init())
