@@ -1,0 +1,199 @@
+@import "help";
+@import "flex";
+@import "elements";
+@import "media";
+
+@mixin body($max-width: 1240px, $font-size: 14px, $font-family: sans-serif) {
+  html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: $font-family;
+    font-size: $font-size;
+    @include flex(100%, column);
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .skeleton {
+    @include flex-skeleton($max-width);
+  }
+
+  .general {
+    flex: 1 0 auto;
+  }
+
+  .general__footer {
+    flex: 0 0 auto;
+  }
+}
+
+@mixin common-typography($font-family) {
+  a {
+    outline: none;
+    text-decoration: none;
+  }
+
+  a,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  fieldset,
+  form,
+  ul,
+  ol,
+  li,
+  dl,
+  dt,
+  dd {
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    font-style: normal;
+    font-family: $font-family;
+  }
+
+  img {
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@mixin common-forms($font-family, $placeholder-color) {
+  a, button, input, .pointer, label {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+    //user-select: none;
+    //-webkit-touch-callout: none;
+  }
+
+  label,
+  input,
+  textarea,
+  option,
+  select {
+    margin: 0;
+    padding: 0;
+    outline: none;
+    font-family: $font-family;
+  }
+
+  input {
+    -webkit-appearance: none;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  input[type="submit"],
+  input[type="button"],
+  button {
+    cursor: pointer;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea {
+    cursor: text;
+    @include placeholder(color, $placeholder-color);
+    @include placeholder(font-weight, bold);
+    @include placeholder(opacity, 1);
+    @include placeholder(font-family, $font-family);
+  }
+}
+
+@mixin common-classes() {
+  .link,
+  .button,
+  .pointer {
+    cursor: pointer;
+  }
+
+  .display--none {
+    display: none;
+  }
+
+  .display--block {
+    display: block;
+  }
+
+  .display--inline-block {
+    display: inline-block;
+  }
+
+  .alignleft {
+    float: left;
+  }
+
+  .alignright {
+    float: right;
+  }
+
+  .aligncenter {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .width-full {
+    width: 100%;
+  }
+
+  .width-half {
+    width: 50%;
+  }
+}
+
+@mixin common-important-classes() {
+  .display--none-force {
+    display: none !important;
+  }
+
+  .display--block-force {
+    display: block !important;
+  }
+
+  .display--inline-block-force {
+    display: inline-block !important;
+  }
+
+  .template {
+    display: none !important;
+  }
+
+  .background {
+    &--transparent {
+      background: transparent !important;
+    }
+  }
+}
+
+@mixin base-light($max-width: 1240px, $placeholder-color: #9b9b9b) {
+  @include common-typography($max-width);
+  @include common-classes();
+}
+
+@mixin base($font-family: sans-serif, $placeholder-color: #9b9b9b, $media-points: 1024 768 480 320) {
+  @include common-typography($font-family);
+  @include common-forms($font-family, $placeholder-color);
+  @include common-classes();
+  @include common-important-classes();
+  @include media-hide-visible($media-points);
+}

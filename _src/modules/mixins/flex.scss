@@ -1,0 +1,56 @@
+@mixin flex($width-list: auto, $flex-direction: row, $justify-content: flex-start, $align-items: stretch, $flex-wrap: nowrap, $reverse: false) {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: $flex-wrap;
+  justify-content: $justify-content;
+  @if $reverse {
+    flex-direction: $flex-direction + '-reverse';
+  } @else {
+    flex-direction: $flex-direction;
+  }
+  @if $flex-wrap == nowrap {
+    align-items: $align-items;
+  } @else {
+    align-content: $align-items;
+  }
+  > * {
+    box-sizing: border-box;
+    @if ($width-list != auto) {
+      @each $width in $width-list {
+        $i: index($width-list, $width);
+        &:nth-child(#{$i}) {
+          width: $width;
+        }
+      }
+    }
+  }
+}
+
+@mixin flex-row($width-list: auto, $justify-content: flex-start, $align-items: stretch, $flex-wrap: nowrap, $reverse: false) {
+  @include flex($width-list, row, $justify-content, $align-items, $flex-wrap, $reverse);
+}
+
+@mixin flex-column($width-list: auto, $justify-content: flex-start, $align-items: stretch, $flex-wrap: nowrap, $reverse: false) {
+  @include flex($width-list, column, $justify-content, $align-items, $flex-wrap, $reverse);
+}
+
+@mixin flex-center($width-list: auto, $flex-wrap: nowrap, $reverse: false) {
+  @include flex-row($width-list, center, center, false, $flex-wrap, $reverse)
+}
+
+@mixin flex-media-row-to-column($media) {
+  @media only screen and (max-width: $media + px) {
+    flex-direction: column;
+  }
+}
+
+@mixin flex-skeleton($max-width) {
+  @include flex-row();
+  max-width: $max-width;
+  margin: 0 auto;
+}
+
+
+
+
+

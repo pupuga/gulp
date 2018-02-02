@@ -1,0 +1,53 @@
+@import "config";
+@import "../../modules/mixins/mixins";
+
+@include body($max-width, $font-size, $font-family);
+@include base-light($max-width, $font-family);
+
+body {
+  line-height: 2em;
+}
+
+h1 {
+  color: blue;
+}
+
+h3 {
+  color: yellow;
+}
+
+amp-img,
+.amp-image {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  &--thumbnail {
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+.amp-general {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  text-align: center;
+  padding: 0 1em;
+}
+
+.amp-wrapper {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: $max-width;
+}
+
+.amp-content {
+  text-align: left;
+}
+
+
+
+
+
+

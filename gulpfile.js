@@ -2,13 +2,14 @@
 
 const gulp = require('gulp');
 const rimraf = require('rimraf');
+const plumber = require('gulp-plumber');
 
 const sass = require('gulp-sass');
+//const sass = require('gulp-ruby-sass');
 const cleanCss = require('gulp-clean-css');
 const autoprefixer = require('gulp-autoprefixer');
 
 const browserify = require('browserify');
-const babel = require('gulp-babel');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const uglify = require('gulp-uglify');
@@ -22,20 +23,22 @@ const imageminJpegRecompress = require('imagemin-jpeg-recompress');
 const imageminPngquant = require('imagemin-pngquant');
 const svgSprite = require("gulp-svg-sprites");
 
-const src = './_src/';
+const src = './_src/custom/';
+const modules = './_src/modules/';
 const dist = './dist/';
 
 gulp.task('rimraf', function (cb) {
     rimraf(dist + '**/*.*', cb);
 });
 
-var filesSass = [src + 'scss/main.scss', src + 'scss/admin.scss'];
-gulp.task('sass:dev', function() {
+let filesSass = [src + 'scss/main.scss', src + 'scss/admin.scss'];
+gulp.task('sass:dev', function () {
     return gulp.src(filesSass)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
-        .pipe(sass().on('error', sass.logError))
+        .pipe(sass({errLogToConsole: true}))
         .pipe(autoprefixer({
-     	    browsers: ['last 2 versions'],
+            browsers: ['last 2 versions'],
             cascade: false
         }))
         .pipe(sourcemaps.write())
@@ -53,9 +56,23 @@ gulp.task('sass', function () {
 });
 
 
-var filesJs = ['main.js', 'admin.js', 'login.js'];
+/*
+gulp.task('sass', () =>
+    sass(filesSass)
+        .on('error', sass.logError)
+        .pipe(plumber())
+        .pipe(autoprefixer({
+            browsers: ['last 2 versions']
+        }))
+        .pipe(cleanCss({keepBreaks: false}))
+        .pipe(gulp.dest(dist + 'css/'))
+);
+*/
+
+
+let filesJs = ['main.js', 'admin.js', 'login.js'];
 gulp.task('js:dev', function () {
-    var tasks = filesJs.map(function (entry) {
+    let tasks = filesJs.map(function (entry) {
         return browserify({entries: [src + 'js/' + entry]})
             .transform('babelify', {presets: ["env"]})
             .bundle()
@@ -70,7 +87,7 @@ gulp.task('js:dev', function () {
 });
 
 gulp.task('js', function () {
-    var tasks = filesJs.map(function (entry) {
+    let tasks = filesJs.map(function (entry) {
         return browserify({entries: [src + 'js/' + entry]})
             .transform('babelify', {presets: ["env"]})
             .bundle()
@@ -116,12 +133,12 @@ gulp.task('up', ['uploads']);
 //gulp.task('default', ['sass:dev', 'js:dev', 'images', 'uploads', 'sprites']);
 gulp.task('default', ['sass:dev']);
 gulp.task('watch-sass', function () {
-    gulp.watch([src + 'scss/**/*.scss'], ['sass:dev']);
-    gulp.watch([src + 'scss/**/*.css'], ['sass:dev']);
+    gulp.watch([src + 'scss/**/*.scss', modules + '/**/*.scss'], ['sass']);
+    gulp.watch([src + 'scss/**/*.css', modules + '/**/*.css'], ['sass']);
 });
 gulp.task('watch', function () {
     gulp.watch([src + 'scss/**/*.scss'], ['sass:dev']);
     gulp.watch([src + 'scss/**/*.css'], ['sass:dev']);
-    gulp.watch([src + 'js/**/*.js'], ['js:dev'])
+    gulp.watch([src + '**/*.js'], ['js:dev'])
 });
-gulp.task('prod', ['sass', 'js', 'images', 'uploads', 'sprites']);
+gulp.task('prod', ['sass'/*, 'js', 'images', 'uploads', 'sprites'*/]);

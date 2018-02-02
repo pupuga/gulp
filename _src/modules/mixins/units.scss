@@ -1,0 +1,51 @@
+@function pow($number, $power) {
+  $value: 1;
+  @if $power > 0 {
+    @for $i from 1 through $power {
+      $value: $number * $value;
+    }
+  }
+
+  @return $value;
+}
+
+@function strip-unit($value) {
+  @if type-of($value) == 'number' and not unitless($value) {
+    $value: $value / ($value * 0 + 1);
+  }
+
+  @return $value;
+}
+
+@function round-unit($value, $delimiter: 2) {
+  $delimiter: pow(10, $delimiter);
+  $value: (ceil($value * $delimiter)) / $delimiter;
+
+  @return $value;
+}
+
+@function from-value($font-size-current, $font-size-base, $unit, $delimiter: 2) {
+  $font-size-current: strip-unit($font-size-current);
+  $font-size-base: strip-unit($font-size-base);
+  $font-size-current-value: round-unit($font-size-current / $font-size-base, $delimiter) * $unit;
+
+  @return $font-size-current-value;
+}
+
+@function em($font-size-current, $font-size-base: $font-size) {
+  $font-size-current: from-value($font-size-current, $font-size-base, 1em);
+
+  @return $font-size-current;
+}
+
+@function rem($font-size-current, $font-size-base: $font-size) {
+  $font-size-current: from-value($font-size-current, $font-size-base, 1rem);
+
+  @return $font-size-current;
+}
+
+@function percents($with-current, $with-base) {
+  $with-current-percent: from-value($with-current, $with-base, 100%, 4);
+
+  @return $with-current-percent;
+}

@@ -1,0 +1,44 @@
+@mixin media($width) {
+  @media only screen and (max-width: $width + px) {
+    @content
+  }
+}
+
+@mixin media-320() {
+  @include media(320);
+}
+
+@mixin media-480() {
+  @include media(480);
+}
+
+@mixin media-576() {
+  @include media(576);
+}
+
+@mixin media-768() {
+  @include media(768);
+}
+
+@mixin media-1024() {
+  @include media(1024);
+}
+
+@mixin media-hide-visible($medias) {
+  @each $media in $medias {
+    .hide-#{$media} {
+      @include media($media) {
+        display: none !important;
+      }
+    }
+    .visible-#{$media} {
+      @include media(4000) {
+        display: none !important;
+      }
+      @include media($media) {
+        display: inline-block !important;
+      }
+    }
+  }
+}
+

@@ -1,0 +1,56 @@
+@mixin box-display($width: auto, $vertical-align: top, $display: inline-block) {
+  display: $display;
+  vertical-align: $vertical-align;
+  width: $width;
+  box-sizing: border-box;
+}
+
+@mixin box-inline-block($width: auto, $vertical-align: top) {
+  @include box-display($width, $vertical-align);
+}
+
+@mixin box-block($width: auto, $vertical-align: top) {
+  @include box-display($width, $vertical-align, block);
+}
+
+@mixin box-none($width: auto, $vertical-align: top) {
+  @include box-display($width, $vertical-align, none);
+}
+
+@mixin box-with-inline-blocks($number: auto, $vertical-align: top, $box-width: 100%) {
+  @include box-inline-block($box-width);
+  > * {
+    float: left;
+    @if ($number == auto) {
+      @include box-inline-block($number, $vertical-align);
+    } @else {
+      @include box-inline-block(100%/$number, $vertical-align);
+    }
+  }
+}
+
+@mixin box-with-inline-blocks-custom($width-list: 50% 50%, $vertical-align: top, $box-width: 100%) {
+  @include box-inline-block($box-width);
+  > * {
+    float: left;
+    @include box-inline-block(auto, $vertical-align);
+    @each $width in $width-list {
+      $i: index($width-list, $width);
+      &:nth-child(#{$i}) {
+        width: $width;
+      }
+    }
+  }
+}
+
+@mixin vertical-align-middle($width: auto, $pseudo: before) {
+  > * {
+    @include box-inline-block($width, middle);
+  }
+  &:#{$pseudo} {
+    content: "";
+    height: 100%;
+    min-height: inherit;
+    @include box-inline-block(0, middle);
+  }
+}

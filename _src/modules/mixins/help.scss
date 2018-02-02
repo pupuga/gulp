@@ -1,0 +1,40 @@
+@mixin browsers($property, $parameters) {
+  -webkit-#{$property}: $parameters;
+  -moz-#{$property}: $parameters;
+  -ms-#{$property}: $parameters;
+  #{$property}: $parameters;
+}
+
+@mixin placeholder($property: none, $parameters: none) {
+  &::-webkit-input-placeholder {
+    opacity: 1;
+    @if ($property != 'none') {
+      $property: $parameters;
+    }
+  }
+  &:-moz-placeholder {
+    @if ($property != 'none') {
+      $property: $parameters;
+    }
+  }
+  &::-moz-placeholder {
+    @if ($property != 'none') {
+      $property: $parameters;
+    }
+  }
+  &:-ms-input-placeholder {
+    opacity: 1;
+    @if ($property != 'none') {
+      $property: $parameters;
+    }
+  }
+}
+
+@mixin width-list($width-list) {
+  @each $width in $width-list {
+    $i: index($width-list, $width);
+    &:nth-child(#{$i}) {
+      width: $width;
+    }
+  }
+}
